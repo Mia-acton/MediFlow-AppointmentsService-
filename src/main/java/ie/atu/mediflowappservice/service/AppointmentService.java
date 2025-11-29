@@ -27,14 +27,28 @@ public class AppointmentService {
         return repository.findById(id);
     }
 
-    public Appointment updateAppointment(Long id, Appointment updatedAppointment) {
-        return repository.findById(id).map(appointment -> {
-            appointment.setAppointmentId(updatedAppointment.getAppointmentId());
-            appointment.setVenue(updatedAppointment.getVenue());
-            appointment.setDate(updatedAppointment.getDate());
-            appointment.setTime(updatedAppointment.getTime());
-            appointment.setDoctorUserName(updatedAppointment.getDoctorUserName());
-            return repository.save(appointment);
+    public List<Appointment> getAppointmentByPatient(String patientUserName) {
+        return repository.findByPatientUserName(patientUserName);
+    }
+
+    public List<Appointment> getAppointmentByDoctor(String doctorUserName) {
+        return repository.findByDoctorUserName(doctorUserName);
+    }
+
+    public List<Appointment> search(String patientUserName, String doctorUserName) {
+        return repository.findByPatientUserNameAndDoctorUserName(patientUserName, doctorUserName);
+    }
+
+    public Appointment updateAppointment(Long id, Appointment updated) {
+        return repository.findById(id).map(existing -> {
+            existing.setPatientUserName(updated.getPatientUserName());
+            existing.setDoctorUserName(updated.getDoctorUserName());
+            existing.setVenue(updated.getVenue());
+            existing.setDate(updated.getDate());
+            existing.setTime(updated.getTime());
+
+            return repository.save(existing);
+
         }).orElseThrow(() -> new RuntimeException("Appointment not found with id " + id));
     }
 
