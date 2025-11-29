@@ -33,8 +33,29 @@ public class AppointmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/patient/{patientUserName}")
+    public ResponseEntity<List<Appointment>> getByPatient(@PathVariable String patientUserName) {
+        return ResponseEntity.ok(service.getAppointmentByPatient(patientUserName));
+    }
+
+    @GetMapping("/doctor/{doctorUserName}")
+    public ResponseEntity<List<Appointment>> getByDoctor(@PathVariable String doctorUserName) {
+        return ResponseEntity.ok(service.getAppointmentByDoctor(doctorUserName));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Appointment>> search(
+            @RequestParam String patient,
+            @RequestParam String doctor
+    ) {
+        return ResponseEntity.ok(service.search(patient, doctor));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id, @RequestBody Appointment appointment) {
+    public ResponseEntity<Appointment> updateAppointment(
+            @PathVariable Long id,
+            @RequestBody Appointment appointment
+    ) {
         return ResponseEntity.ok(service.updateAppointment(id, appointment));
     }
 
