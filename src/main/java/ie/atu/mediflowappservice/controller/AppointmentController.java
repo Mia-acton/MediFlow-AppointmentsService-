@@ -5,6 +5,7 @@ import ie.atu.mediflowappservice.service.AppointmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -18,7 +19,11 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(service.createAppointment(appointment));
+        Appointment savedAppointment = service.createAppointment(appointment);
+
+        return ResponseEntity
+                .created(URI.create("/appointments/" + savedAppointment.getAppointmentId()))
+                .body(savedAppointment);
     }
 
     @GetMapping
