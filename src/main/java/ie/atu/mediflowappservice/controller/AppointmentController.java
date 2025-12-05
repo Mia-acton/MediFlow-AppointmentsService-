@@ -1,7 +1,9 @@
 package ie.atu.mediflowappservice.controller;
 
 import ie.atu.mediflowappservice.model.Appointment;
+import ie.atu.mediflowappservice.model.AppointmentCreate;
 import ie.atu.mediflowappservice.service.AppointmentService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +20,14 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        Appointment savedAppointment = service.createAppointment(appointment);
+    public ResponseEntity<Appointment> createAppointment(
+            @RequestBody @Valid AppointmentCreate request) {
+
+        Appointment saved = service.createAppointment(request);
 
         return ResponseEntity
-                .created(URI.create("/appointments/" + savedAppointment.getAppointmentId()))
-                .body(savedAppointment);
+                .created(URI.create("/appointments/" + saved.getAppointmentId()))
+                .body(saved);
     }
 
     @GetMapping

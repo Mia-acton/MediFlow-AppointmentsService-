@@ -1,6 +1,7 @@
 package ie.atu.mediflowappservice;
 
 import ie.atu.mediflowappservice.model.Appointment;
+import ie.atu.mediflowappservice.model.AppointmentCreate;
 import ie.atu.mediflowappservice.service.AppointmentService;
 import ie.atu.mediflowappservice.repository.AppointmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +27,19 @@ class AppointmentServiceTest {
     private AppointmentService service;
 
     private Appointment appointment;
+    private AppointmentCreate appointmentCreate;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+        appointmentCreate = new AppointmentCreate(
+                "john_doe",
+                "Clinic A",
+                LocalDate.now().plusDays(1),
+                LocalTime.of(10, 30),
+                "dr_smith"
+        );
+
         appointment = new Appointment(
                 1L,
                 "john_doe",
@@ -42,12 +52,13 @@ class AppointmentServiceTest {
 
     @Test
     void createThenFindById() {
-        when(repo.save(appointment)).thenReturn(appointment);
+        when(repo.save(any(Appointment.class))).thenReturn(appointment);
         when(repo.findById(1L)).thenReturn(Optional.of(appointment));
 
-        service.createAppointment(appointment);
+        Appointment created = service.createAppointment(appointmentCreate);
         Optional<Appointment> found = service.getAppointmentById(1L);
 
+        assertNotNull(created);
         assertTrue(found.isPresent());
         assertEquals("john_doe", found.get().getPatientUserName());
     }
@@ -64,6 +75,14 @@ class AppointmentServiceTest {
 
     @Test
     void updateAppointmentSuccess() {
+        AppointmentCreate updatedCreate = new AppointmentCreate(
+                "john_doe",
+                "Clinic B",
+                LocalDate.now().plusDays(2),
+                LocalTime.of(11, 0),
+                "dr_smith"
+        );
+
         Appointment updated = new Appointment(
                 1L,
                 "john_doe",
@@ -74,9 +93,9 @@ class AppointmentServiceTest {
         );
 
         when(repo.findById(1L)).thenReturn(Optional.of(appointment));
-        when(repo.save(updated)).thenReturn(updated);
+        when(repo.save(any(Appointment.class))).thenReturn(updated);
 
-        Appointment result = service.updateAppointment(1L, updated);
+        Appointment result = service.updateAppointment(1L, updatedCreate);
 
         assertEquals("Clinic B", result.getVenue());
         assertEquals(LocalTime.of(11, 0), result.getTime());

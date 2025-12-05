@@ -49,13 +49,13 @@ public class AppointmentService {
         return repository.findByPatientUserNameAndDoctorUserName(patientUserName, doctorUserName);
     }
 
-    public Appointment updateAppointment(Long id, Appointment updated) {
+    public Appointment updateAppointment(Long id, AppointmentCreate request) {
         return repository.findById(id).map(existing -> {
-            existing.setPatientUserName(updated.getPatientUserName());
-            existing.setDoctorUserName(updated.getDoctorUserName());
-            existing.setVenue(updated.getVenue());
-            existing.setDate(updated.getDate());
-            existing.setTime(updated.getTime());
+            existing.setPatientUserName(request.getPatientUserName());
+            existing.setDoctorUserName(request.getDoctorUserName());
+            existing.setVenue(request.getVenue());
+            existing.setDate(request.getDate());
+            existing.setTime(request.getTime());
 
             return repository.save(existing);
 
