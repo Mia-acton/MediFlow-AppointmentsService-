@@ -2,6 +2,7 @@ package ie.atu.mediflowappservice.service;
 
 import ie.atu.mediflowappservice.model.Appointment;
 import ie.atu.mediflowappservice.repository.AppointmentRepository;
+import ie.atu.mediflowappservice.model.AppointmentCreate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +16,18 @@ public class AppointmentService {
         this.repository = repository;
     }
 
-    public Appointment createAppointment(Appointment appointment) {
+    public Appointment createAppointment(AppointmentCreate request) {
+        Appointment appointment = new Appointment();
+
+        appointment.setPatientUserName(request.getPatientUserName());
+        appointment.setVenue(request.getVenue());
+        appointment.setDate(request.getDate());
+        appointment.setTime(request.getTime());
+        appointment.setDoctorUserName(request.getDoctorUserName());
+
         return repository.save(appointment);
     }
+
 
     public List<Appointment> getAllAppointments() {
         return repository.findAll();
