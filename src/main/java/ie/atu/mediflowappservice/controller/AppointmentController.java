@@ -37,9 +37,8 @@ public class AppointmentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
-        return service.getAppointmentById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Appointment appointment = service.getAppointmentById(id);
+        return ResponseEntity.ok(appointment);
     }
 
     @GetMapping("/patient/{patientUserName}")
