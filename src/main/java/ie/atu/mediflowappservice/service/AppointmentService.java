@@ -3,10 +3,10 @@ package ie.atu.mediflowappservice.service;
 import ie.atu.mediflowappservice.model.Appointment;
 import ie.atu.mediflowappservice.repository.AppointmentRepository;
 import ie.atu.mediflowappservice.model.AppointmentCreate;
+import ie.atu.mediflowappservice.exception.AppointmentNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AppointmentService {
@@ -33,8 +33,9 @@ public class AppointmentService {
         return repository.findAll();
     }
 
-    public Optional<Appointment> getAppointmentById(Long id) {
-        return repository.findById(id);
+    public Appointment getAppointmentById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new AppointmentNotFoundException(id));
     }
 
     public List<Appointment> getAppointmentByPatient(String patientUserName) {
@@ -59,10 +60,15 @@ public class AppointmentService {
 
             return repository.save(existing);
 
-        }).orElseThrow(() -> new RuntimeException("Appointment not found with id " + id));
+        }).orElseThrow(() -> new AppointmentNotFoundException(id));
     }
 
     public void deleteAppointment(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new AppointmentNotFoundException(id);
+        }
+
         repository.deleteById(id);
     }
 }
