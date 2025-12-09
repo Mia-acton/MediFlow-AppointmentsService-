@@ -1,5 +1,6 @@
 package ie.atu.mediflowappservice;
 
+import ie.atu.mediflowappservice.exception.AppointmentNotFoundException;
 import ie.atu.mediflowappservice.model.Appointment;
 import ie.atu.mediflowappservice.model.AppointmentCreate;
 import ie.atu.mediflowappservice.service.AppointmentService;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+// Test class introducing Mockito
 class AppointmentServiceTest {
 
     @Mock
@@ -50,19 +52,21 @@ class AppointmentServiceTest {
         );
     }
 
+    // Create and Get
     @Test
     void createThenFindById() {
         when(repo.save(any(Appointment.class))).thenReturn(appointment);
         when(repo.findById(1L)).thenReturn(Optional.of(appointment));
 
         Appointment created = service.createAppointment(appointmentCreate);
-        Optional<Appointment> found = service.getAppointmentById(1L);
+        Appointment found = service.getAppointmentById(1L);
 
         assertNotNull(created);
-        assertTrue(found.isPresent());
-        assertEquals("john_doe", found.get().getPatientUserName());
+        assertNotNull(found);
+        assertEquals("john_doe", found.getPatientUserName());
     }
 
+    // Get All
     @Test
     void findAllAppointments() {
         when(repo.findAll()).thenReturn(List.of(appointment));
@@ -73,6 +77,7 @@ class AppointmentServiceTest {
         assertEquals("Clinic A", all.get(0).getVenue());
     }
 
+    // Update Success
     @Test
     void updateAppointmentSuccess() {
         AppointmentCreate updatedCreate = new AppointmentCreate(
@@ -101,9 +106,10 @@ class AppointmentServiceTest {
         assertEquals(LocalTime.of(11, 0), result.getTime());
     }
 
+    // Delete Success
     @Test
     void deleteAppointmentSuccess() {
-        when(repo.findById(1L)).thenReturn(Optional.of(appointment));
+        when(repo.existsById(1L)).thenReturn(true);
         doNothing().when(repo).deleteById(1L);
 
         service.deleteAppointment(1L);
@@ -111,11 +117,23 @@ class AppointmentServiceTest {
         verify(repo, times(1)).deleteById(1L);
     }
 
+    // Get Not Found - throws exception
     @Test
     void findByIdNotFound() {
         when(repo.findById(2L)).thenReturn(Optional.empty());
 
-        Optional<Appointment> found = service.getAppointmentById(2L);
-        assertTrue(found.isEmpty());
+        assertThrows(AppointmentNotFoundException.class, () -> {
+            service.getAppointmentById(2L);
+        });
+    }
+
+    // Delete Not Found - throws exception
+    @Test
+    void deleteAppointmentNotFound() {
+        when(repo.existsById(1L)).thenReturn(false);
+
+        assertThrows(AppointmentNotFoundException.class, () -> {
+            service.deleteAppointment(1L);
+        });
     }
 }
